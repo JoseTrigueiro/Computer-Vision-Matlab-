@@ -1,0 +1,32 @@
+close all
+
+coneImage = rgb2gray(imread('images\blue_cone1.png'));
+% coneImage = coneImage(:,:,2);
+imread('images\cone3.png');
+%[~,A] = segmentImage(A);
+Image = rgb2gray(imread('images\cone3.png'));
+% Image = Image(:,:,2);
+conePoints = detectSURFFeatures(coneImage);
+imagePoints = detectSURFFeatures(Image);
+figure
+subplot(1,2,1)
+imshow(coneImage);
+title('Feature Points from Cone Image');
+hold on;
+plot(conePoints);
+subplot(1,2,2)
+imshow(Image);
+title('300 Strongest Feature Points from Scene Image');
+hold on;
+plot(imagePoints);
+[coneFeatures, conePoints] = extractFeatures(coneImage, conePoints);
+[imageFeatures, imagePoints] = extractFeatures(Image, imagePoints);
+%"MaxRatio",1,"MatchThreshold",0.5,
+conePairs = matchFeatures(coneFeatures, imageFeatures,"MatchThreshold",50,"MaxRatio",0.7);
+
+matchedConePoints = conePoints(conePairs(:, 1), :);
+matchedImagePoints = imagePoints(conePairs(:, 2), :);
+figure;
+showMatchedFeatures(coneImage, Image, matchedConePoints, ...
+    matchedImagePoints, 'montage');
+title('Putatively Matched Points (Including Outliers)');
